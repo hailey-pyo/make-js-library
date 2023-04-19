@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/js/made.js"></script>
+</head>
+<body>
+    <script>
+       var users = [
+        { id: 1, name: "ID", age: 36 },
+        { id: 2, name: "BJ", age: 32 },
+        { id: 3, name: "JM", age: 32 },
+        { id: 4, name: "PJ", age: 27 },
+        { id: 5, name: "HA", age: 25 },
+        { id: 6, name: "JE", age: 26 },
+        { id: 7, name: "JI", age: 31 },
+        { id: 8, name: "MP", age: 23 }
+       ]
+
+
+      //30살 이상 회원 찾기
+      var over_30 =  _filter(users, function(users) { return users.age >= 30 });
+      console.log(over_30);
+
+      //30살 이상의 회원 나이 찾기
+      console.log(
+        _map(over_30, function(user) { return user.name; })
+      );
+
+      //기존에도 map과 filter가 있지만, 만드는 이유
+      //arraylike 객체에서는 사용불가
+      //함수형프로그래밍은 데이터생기기 이전에 함수가 있으므로 유연성이 높아진다
+      [1,2,3,4].map(function(val){ return val*2; });
+  
+
+      //curry이용
+      var add = _curry(function(a,b){
+        return a+b;
+      });
+      var add10 = add(10);
+      console.log(add10(5)); // 15
+      console.log(add(5)(3)) // 8
+      
+      //curryr이용
+      var sub = _curryr(function (a, b){
+        return a-b;
+      });
+      sub(10, 5); //5
+      var sub10 = sub(10);
+      sub10(5); //-5
+
+
+      //curryr적용한 _get이용
+      var user1 = users[0];
+      console.log(_get(user1, 'name'));
+      console.log(_get('name')(user1));
+
+      console.log(
+        _map(over_30, function(user) { return user.name; })
+      );
+      // -> _get이용하여 변경
+      console.log(
+        _map(over_30, _get("name"))
+      );
+
+
+      //reduce이용
+      console.log(
+        _reduce([1,2,3], add, 0)
+      );
+      console.log(
+        _reduce([1,2,3], add)
+      );
+
+      //_pipe이용
+      console.log( "_pipe 이용" );
+      var f1 = _pipe(
+        function(a) { return a+1; }, // 1+1
+        function(a) { return a*2; } // 2*2
+      )
+      console.log( f1(1) );
+
+
+      //_go이용 (_pipe와 다르게 즉시실행함수임)
+      _go(1,
+        function(a) { return a+1; }, // 1+1
+        function(a) { return a*2; } // 2*2
+      );
+
+
+
+      //_go이용
+      _go(users,
+        function(users){
+          return _filter(users, function(user){
+            return user.age >= 30;
+          })
+        },
+        function(users){
+          return _map(users, _get("name"));
+        },
+        console.log
+      );
+      //_filter,_map에 curryr 적용하여 수정
+      _go(users,
+        _filter(user => user.age >= 30),
+        _map(_get("name")),
+        console.log
+      );
+
+
+      //_keys이용
+      console.log(
+          _keys(null)
+        );
+      console.log( 
+        _keys({name: "ID", age: 33})
+      );
+        
+      // _each의 외부 다형성 높이기 - _each에 null 넣어도 에러안나게   
+      _each(null, console.log); 
+
+      // _each의 외부 다형성 높이기 - key-value쌍 넣어도 에러안나게   
+        _go(
+          {1: users[0],
+          2: users[2]},
+          _map(function(user){
+            console.log(user);
+            return user.name.toLowerCase();
+          }),
+          console.log
+        );
+    </script>
+</body>
+</html>
