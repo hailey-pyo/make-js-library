@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/js/made.js"></script>
+</head>
+<body>
+<script>
+//컬렉션이란? 프로그래밍언어가 제공하는 값을 담을 수 있는 컨테이너
+var users = [
+    { id: 10, name: "ID", age: 36 },
+    { id: 20, name: "BJ", age: 32 },
+    { id: 30, name: "JM", age: 32 },
+    { id: 40, name: "PJ", age: 27 },
+    { id: 50, name: "HA", age: 25 },
+    { id: 60, name: "JE", age: 26 },
+    { id: 70, name: "JI", age: 31 },
+    { id: 80, name: "MP", age: 23 },
+    { id: 90, name: "FP", age: 13 }
+];
+
+//1. 수집하기 - map
+//_values, _pluck 이용
+console.log(_values(users[0]));
+console.log(_map(_identity)(users[0])); //위와동일한코드
+
+console.log(
+    _pluck(users, 'age')
+);
+
+//2. 거르기 - filter
+//_reject, _compact 이용
+console.log(
+    _reject(users, function(user){
+        return user.age>30;
+    })
+);
+console.log(
+    _compact([1, 2, 0, false, null, {}])
+);
+
+//3. 찾아내기 - find
+//_find_index, _some, _every 이용
+console.log(
+    _find(users, function(user){
+        return user.name == "BJ"; //주로 이렇게 하나만 찾을때 사용됨.
+    })
+);
+console.log(
+    _find_index(users, function(user){
+        return user.id == 50;
+    })
+);
+_go(users,
+_find_index(function(user){ return user.id == 50; }),
+console.log
+);
+
+console.log(
+    _some([1, 2, 4, 10, 20], function(val){ //하나만 만족해도 true
+        return val > 10; //expect result: ture
+    })
+);
+console.log(
+    _every([1, 2, 4, 10, 20], function(val){ //모두 만족해야 true
+        return val > 10; //expect result: false
+    })
+);
+//_some, _every에 predi함수 없어도 동작가능하도록 변경
+console.log(
+    _some([1,2, null, 0])
+);
+console.log(
+    _every([1,2,null,0])
+);
+
+
+//4. 접기,축약 - reduce
+//min, max, min_by, max_by 이용
+//group_by, push 이용
+//count_by, inc 이용
+console.log(
+    _min([1, 2, 4, 10, 5, -4])
+);
+console.log(
+    _max([1, 2, 4, 10, 5, -4])
+);
+console.log(
+    _min_by([1, 2, 4, 10, 5, -4], Math.abs)
+);
+console.log(
+    _max_by([1, 2, 4, 10, 5, -4, -11], Math.abs)
+);
+_go(users,
+    _filter(user => user.age >= 30),
+    _min_by(function(user){ return user.age }),
+    console.log
+);
+
+console.log(
+    _group_by(users, function(user){
+        return user.age;
+    })
+);
+console.log(
+    _count_by(users, function(user){
+        return user.age;
+    })
+);
+
+//콜백함수 인자에 key 추가해줌
+console.log(
+    _map(users[0], function(val, key){
+        return [key, val];
+    })
+);
+//위와 동일
+console.log( _pairs(users[0]) );
+
+
+
+//응용
+var _document_write =  document.write.bind(document);
+_go(users,
+    _count_by(function(user){
+        return user.age - user.age%10;
+    }),
+    _map((count, key) => `<li>${key}대는 ${count}명</li>`),
+    list => "<ul>" + list.join("") + "</ul>",
+    //방법1
+    // function(html){
+    //     document.write(html);
+    // },
+    //방법2
+    // _document_write,
+    //방법3
+    document.write.bind(document)
+);
+
+var f1 = _pipe(
+    _count_by(function(user){
+        return user.age - user.age%10;
+    }),
+    _map((count, key) => `<li>${key}대는 ${count}명</li>`),
+    list => "<ul>" + list.join("") + "</ul>",
+    document.write.bind(document)
+);
+
+f1(users);
+
+var f2 = _pipe(_reject(user => user.age < 20), f1);
+f2(users);
+
+
+</script>
+</body>
+</html>

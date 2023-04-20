@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/js/partial.js"></script>
+</head>
+<body>
+<script>
+//지연 평가를 시작시키고 유지시키는(이어가는) 함수
+// 1.map
+// 2. filter, reject
+
+//끝을 내는 함수
+// 1. take
+// 2. some, every, find
+
+//기존코드
+var mi = fi = 0;
+_.go(
+    _.range(100),
+    _.map(function(val){
+        ++mi;
+        return val*val;
+    }),
+    _.filter(function(val){
+        ++fi;
+        return val%2; //0이면 false니까.. 홀수만 나오게됨
+    }),
+    _.take(5),
+    console.log
+)
+
+console.log(mi, fi); //100, 100 출력됨. (5개의 데이터만 추출하는데)
+
+//지연평가를 통해 최적화
+mi = fi = 0;
+_.go(
+    _.range(100),
+    L.map(function(val){
+        ++mi;
+        return val*val;
+    }),
+    L.filter(function(val){
+        ++fi;
+        return val%2; //0이면 false니까.. 홀수만 나오게됨
+    }),
+    L.take(5),
+    console.log
+)
+
+console.log(mi, fi); // 10, 10 출력됨. value를 하나씩 밑함수으로 내려서 실행함
+
+
+</script>
+</body>
+</html>
