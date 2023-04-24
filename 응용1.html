@@ -5,9 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="./js/partial.js"></script>
 </head>
 <body>
 <script>
+//데이터
 var users = [
   {id: 101, name: "ID"},
   {id: 102, name: "BJ"},
@@ -37,7 +39,97 @@ var comments = [
   {id: 309, body: "댓글9", user_id: 103, post_id: 202},
   {id: 310, body: "댓글10", user_id: 105, post_id: 201},
 ];
-    
+   
+
+// 1. 특정인의 posts의 모든 comments 거르기
+_.go(
+  _.filter(posts, function(post){
+    return post.user_id == 101;
+  }),
+  function(posts){
+    return _.filter(comments, function(comment){
+      return _.find(posts, function(post){
+        return post.id == comment.post_id;
+      });
+    });
+  },
+  console.log
+);
+//효율적으로 수정
+_.go(
+  // _.filter(posts, function(post){
+  //   return post.user_id == 101;
+  // }),
+  _.where(posts, { user_id: 101 }),
+  // _.map(function(post){
+  //   return post.id;
+  // }),
+  _.pluck("id"),
+  function(post_ids){
+    return _.filter(comments, function(comment){
+      return _.contains(post_ids, comment.post_id);
+    });
+  },
+  console.log
+);
+
+//_.contains예시
+console.log(_.contains([1,2,6,10], 5)); //false
+console.log(_.contains([1,2,6,10], 6)); //true
+
+
+// 2. 특정인의 posts에 comments를 단 친구의 이름들 뽑기
+_.go(
+  _.where(posts, { user_id: 101 }),
+  _.pluck("id"),
+  function(post_ids){
+    return _.filter(comments, function(comment){
+      return _.contains(post_ids, comment.post_id);
+    });
+  },
+  _.map(function(comment){
+    return _.find(users, function(user){
+      return user.id == comment.user_id;
+    }).name;
+  }),
+  _.uniq,
+  console.log
+);
+
+
+// 3. 특정인의 posts에 comments를 단 친구들 카운트 정보
+_.go(
+  _.where(posts, { user_id: 101 }),
+  _.pluck("id"),
+  function(post_ids){
+    return _.filter(comments, function(comment){
+      return _.contains(post_ids, comment.post_id);
+    });
+  },
+  _.map(function(comment){
+    return _.find(users, function(user){
+      return user.id == comment.user_id;
+    }).name;
+  }),
+  _.count_by,
+  console.log
+);
+
+
+// 4. 특정인이 comments를 단 posts 거르기
+_.go(
+  _.where(comments, { user_id: 105 }),
+  _.pluck("post_id"),
+  _.uniq,
+  function(post_ids){
+    return _.filter(posts, function(post){
+      return _.contains(post_ids, post.id);
+    })
+  },
+  console.log
+);
+
+
 </script>
 </body>
 </html>

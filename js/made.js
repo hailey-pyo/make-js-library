@@ -116,7 +116,7 @@ function _keys(obj){
 
 
 // 컬렉션중심 프로그래밍! 
-//1. 수집하기 - map
+//1. 수집하기 - map pluck
 //_values, _pluck 만들기
 
 // function _values(data) {
@@ -141,6 +141,7 @@ var _values = _map(_identity);//_map을 커링으로 구현했놨기때문에, �
 function _pluck(data, key) {
     return _map(data, _get(key))
 }
+var _pluck = _curryr(_pluck);
 
 
 //2. 거르기 - filter
